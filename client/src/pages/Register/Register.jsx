@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./register.css";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Select from "react-select";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css'
 
 const Register = () => {
   const [inputdata, setInputData] = useState({
@@ -15,11 +17,11 @@ const Register = () => {
     gender: "",
     location: "",
   });
-  console.log("inputData", inputdata)
+  console.log("inputData", inputdata);
 
   const [status, setStatus] = useState("Active");
-
   const [image, setImage] = useState("");
+  const [preview, setPreview] = useState("");
 
   //select Option
   const options = [
@@ -34,13 +36,63 @@ const Register = () => {
     setInputData({ ...inputdata, [name]: value });
   };
 
+  // status set
+
+  const setStatusValue = (e) => {
+    setStatus(e.value);
+  };
+
+  // set Image
+
+  const setImageValue = (e) => {
+    setImage(e.target.files[0]);
+  };
+
+  useEffect(() => {
+    if (image) {
+      setPreview(URL.createObjectURL(image));
+    }
+  }, [image]);
+
+  // submit user data
+
+  const submitUserData = (e) => {
+    e.preventDefault();
+
+    const { fname, lname, email, mobile, gender, location } = inputdata;
+
+    if(fname ===""){
+       toast.error("first name fill") 
+    }else if( lname===''){
+        toast.error("last name fill")
+    }else if ( email===''){
+        toast.error("email id  is required ")
+    } else if (!email.includes("@")){
+        toast.error("valid email")
+    }else if (mobile===""){
+        toast.error("fill mobile")
+    }else if(mobile.length<10){
+        toast.error("enter valid number")
+    }else if(gender === ""){
+        toast.error("select gender")
+    } else if (status ===""){
+        toast.error("status fill")
+    }else if (image === ""){
+        toast.error("select img")
+    }else if ( location === ""){
+        toast.error("location required")
+    }else {
+        toast.success("done")
+    }
+    }
+  ;
   return (
     <>
       <div className="container">
         <h2 className="text-center mt-1">Register Your Details</h2>
         <Card>
           <div className="profile_div text-center">
-            <img src="/man.png" alt="img" />
+            <img src={preview ? preview : "/man.png"} alt="img" />
           </div>
           <Form>
             <Row>
@@ -51,6 +103,7 @@ const Register = () => {
                   name="fname"
                   placeholder="Enter Your First Name"
                   onChange={setInputValue}
+                  value={inputdata.fname}
                 />
               </Form.Group>
               <Form.Group className="mb-3 col-lg-6" controlId="formBasicEmail">
@@ -60,6 +113,7 @@ const Register = () => {
                   name="lname"
                   placeholder="Enter Your Last Name"
                   onChange={setInputValue}
+                  value={inputdata.lname}
                 />
               </Form.Group>
               <Form.Group className="mb-3 col-lg-6" controlId="formBasicEmail">
@@ -69,6 +123,7 @@ const Register = () => {
                   name="email"
                   placeholder="Enter Your Email"
                   onChange={setInputValue}
+                  value={inputdata.email}
                 />
               </Form.Group>
               <Form.Group className="mb-3 col-lg-6" controlId="formBasicEmail">
@@ -78,6 +133,7 @@ const Register = () => {
                   name="mobile"
                   placeholder="Enter Your Mobile Number"
                   onChange={setInputValue}
+                  value={inputdata.mobile}
                 />
               </Form.Group>
               <Form.Group className="mb-3 col-lg-6" controlId="formBasicEmail">
@@ -99,7 +155,7 @@ const Register = () => {
               </Form.Group>
               <Form.Group className="mb-3 col-lg-6" controlId="formBasicEmail">
                 <Form.Label>Select Your Status</Form.Label>
-                <Select options={options} />
+                <Select options={options} onChange={setStatusValue} value={status} />
               </Form.Group>
               <Form.Group className="mb-3 col-lg-6" controlId="formBasicEmail">
                 <Form.Label>Select Your Profile</Form.Label>
@@ -107,6 +163,7 @@ const Register = () => {
                   type="file"
                   placeholder="profile"
                   name="user_profile"
+                  onChange={setImageValue}
                 />
               </Form.Group>
               <Form.Group className="mb-3 col-lg-6" controlId="formBasicEmail">
@@ -116,14 +173,16 @@ const Register = () => {
                   placeholder="Enter Your Location"
                   name="location"
                   onChange={setInputValue}
+                  value={inputdata.location}
                 />
               </Form.Group>
-              <Button variant="primary" type="submit">
+              <Button variant="primary" type="submit" onClick={submitUserData}>
                 Submit
               </Button>
             </Row>
           </Form>
         </Card>
+        <ToastContainer/>
       </div>
     </>
   );
